@@ -6,4 +6,6 @@ const { show } = useNotifications()
 window.$notify = show
 </script>
 
-<template />
+<template>
+  <div />
+</template>
