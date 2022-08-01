@@ -2,7 +2,7 @@
 
 def pipeline = new org.js.AppPipeline(
     steps: this,
-    buildDockerImage: 'build-tools/node:16-ubuntu-cypress',
+    buildDockerImage: 'build-tools/node:16-pnpm7-test',
     dockerImageName: 'klaytn/klaytn-frontend',
     dockerRegistryCred: 'bot-klaytn-rw',
     npmRegistries: [:],
