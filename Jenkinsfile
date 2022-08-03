@@ -1,6 +1,5 @@
 @Library('jenkins-library' ) _
 
-def jobParams
 def pipeline = new org.js.LibPipeline(steps: this,
     buildDockerImage: 'build-tools/node:16-pnpm7-test',
     dockerImageName: 'klaytn/klaytn-frontend',
