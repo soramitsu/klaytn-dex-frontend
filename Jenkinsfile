@@ -11,6 +11,5 @@ def pipeline = new org.js.AppPipeline(
     buildCmds: ['pnpm build'],
     sonarProjectName: 'klaytn-frontend',
     sonarProjectKey: 'jp.co.soramitsu:klaytn-frontend',
-    dockerImageTags: ['master': 'latest', 'develop': 'dev', 'remove-ci-cratches': 'duty'],
     gitUpdateSubmodule: true)
 pipeline.runPipeline()
