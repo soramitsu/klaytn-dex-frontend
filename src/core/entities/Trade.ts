@@ -1,13 +1,19 @@
 import Pair from './Pair'
-import Percent from './Percent'
-import Price from './Price'
 import Route from './Route'
 import TokenAmount from './TokenAmount'
 import TokenImpl from './TokenImpl'
 import { TRADE_MAX_HOPS, TRADE_MAX_NUM_RESULTS, TRADE_MAX_PRICE_IMPACT } from '../const'
 import { Address } from '../types'
 
-import { UniTrade, UniTradeType, UniBestTradeOptions, UniToken, UniFraction } from './uni-entities'
+import {
+  UniTrade,
+  UniTradeType,
+  UniBestTradeOptions,
+  UniToken,
+  UniFraction,
+  UniPrice,
+  UniPercent,
+} from './uni-entities'
 
 type UniTradeWithUniTokens = UniTrade<UniToken, UniToken, any>
 
@@ -47,8 +53,8 @@ export default class Trade {
 
     const trades: UniTradeWithUniTokens[] =
       props.tradeType === 'exact-in'
-        ? UniTrade.bestTradeExactIn(pairsUni, props.amountIn.toUni(), props.tokenOut.toUni(), options)
-        : UniTrade.bestTradeExactOut(pairsUni, props.tokenIn.toUni(), props.amountOut.toUni(), options)
+        ? UniTrade.bestTradeExactIn(pairsUni, props.amountIn, props.tokenOut.toUni(), options)
+        : UniTrade.bestTradeExactOut(pairsUni, props.tokenIn.toUni(), props.amountOut, options)
 
     const trade = trades.find((x) => x.priceImpact.lessThan(MAX_PRICE_IMPACT_AS_UNI_FRACTION))
     if (!trade) return null
@@ -59,16 +65,16 @@ export default class Trade {
   public readonly tradeType: TradeType
   public readonly inputAmount: TokenAmount
   public readonly outputAmount: TokenAmount
-  public readonly executionPrice: Price
-  public readonly priceImpact: Percent
+  public readonly executionPrice: UniPrice<UniToken, UniToken>
+  public readonly priceImpact: UniPercent
 
   protected constructor(trade: UniTradeWithUniTokens) {
     this.route = Route.fromUniRoute(trade.route)
     this.tradeType = trade.tradeType === UniTradeType.EXACT_INPUT ? 'exact-in' : 'exact-out'
     this.inputAmount = TokenAmount.fromUni(trade.inputAmount)
     this.outputAmount = TokenAmount.fromUni(trade.outputAmount)
-    this.executionPrice = Price.fromUni(trade.executionPrice)
-    this.priceImpact = new Percent(trade.priceImpact.numerator.toString(), trade.priceImpact.denominator.toString())
+    this.executionPrice = trade.executionPrice
+    this.priceImpact = new UniPercent(trade.priceImpact.numerator.toString(), trade.priceImpact.denominator.toString())
   }
 
   public routePath(): Address[] {

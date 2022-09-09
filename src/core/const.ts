@@ -1,5 +1,5 @@
-import Percent from './entities/Percent'
 import type { Token, Address, TokenSymbol, Network } from './types'
+import { UniPercent } from './entities/uni-entities'
 
 /**
  * Klay token address
@@ -39,13 +39,13 @@ export const NETWORK: Network = Object.freeze({
 /**
  * It is static and equals 0.3%
  */
-export const POOL_COMMISSION = new Percent(3, 1000)
+export const POOL_COMMISSION = new UniPercent(3, 1000)
 
 export const TRADE_MAX_HOPS = 3
 
 export const TRADE_MAX_NUM_RESULTS = 3
 
-export const TRADE_MAX_PRICE_IMPACT = new Percent(10)
+export const TRADE_MAX_PRICE_IMPACT = new UniPercent(1, 10)
 
 export const WHITELIST_TOKENS = Object.freeze([
   {

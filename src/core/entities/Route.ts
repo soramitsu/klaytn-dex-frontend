@@ -1,8 +1,7 @@
 import TokenImpl from './TokenImpl'
 import Pair from './Pair'
-import Price from './Price'
 
-import { UniRoute, UniToken } from './uni-entities'
+import { UniRoute, UniToken, UniPrice } from './uni-entities'
 
 export default class Route {
   public static fromUniRoute(route: UniRoute<UniToken, UniToken>): Route {
@@ -10,7 +9,7 @@ export default class Route {
       pairs: route.pairs.map((x) => Pair.fromUni(x)),
       input: TokenImpl.fromUni(route.input),
       output: TokenImpl.fromUni(route.output),
-      midPrice: Price.fromUni(route.midPrice),
+      midPrice: route.midPrice,
       path: route.path.map((x) => TokenImpl.fromUni(x)),
     })
   }
@@ -19,7 +18,7 @@ export default class Route {
   public readonly path!: TokenImpl[]
   public readonly input!: TokenImpl
   public readonly output!: TokenImpl
-  public readonly midPrice!: Price
+  public readonly midPrice!: UniPrice<UniToken, UniToken>
 
   protected constructor(props: Pick<Route, 'pairs' | 'input' | 'output' | 'midPrice' | 'path'>) {
     Object.assign(this, props)

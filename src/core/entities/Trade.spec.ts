@@ -42,6 +42,6 @@ describe('Trade', () => {
 
     expect(trade).not.toBeNull()
     expect(trade!.route.toString()).toMatchInlineSnapshot('"MER > VEN"')
-    expect(trade!.priceImpact.toFormat()).toMatchInlineSnapshot('"33.47 %"')
+    expect(trade!.priceImpact.toFixed()).toMatchInlineSnapshot('"33.47 %"')
   })
 })
