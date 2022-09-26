@@ -7,7 +7,7 @@ import Debug from 'debug'
 import { useSwapAmounts, GetAmountsProps } from '../composable.get-amounts'
 import { useTrade } from '../composable.trade'
 import { usePairAddress, usePairBalance } from '../../ModuleTradeShared/composable.pair-by-tokens'
-import { useSwapValidation, ValidationError } from '../composable.validation'
+import { useSwapValidation } from '../composable.validation'
 import { buildSwapProps, TokenAddrAndWeiInput } from '../util.swap-props'
 import {
   usePairInput,
@@ -19,6 +19,7 @@ import { useRates } from '@/modules/ModuleTradeShared/composable.rates'
 import { RouteName } from '@/types'
 import { useControlledComposedKey } from '@/utils/composable.controlled-composed-key'
 import { usePairsQuery } from '../query.pairs'
+import { MAX_UINT256 } from '@/modules/ModuleEarnShared/const'
 
 const debugModule = Debug('swap-store')
 
@@ -26,6 +27,7 @@ type NormalizedWeiInput = TokensPair<TokenAddrAndWeiInput> & { trade: Trade; amo
 
 function useSwap(input: Ref<null | NormalizedWeiInput>) {
   const dexStore = useDexStore()
+  const swapStore = useSwapStore()
   const tokensStore = useTokensStore()
   const { notify } = useNotify()
 
@@ -45,8 +47,9 @@ function useSwap(input: Ref<null | NormalizedWeiInput>) {
   const scope = useParamScope(filteredKey, ({ props: { trade, tokenA, tokenB, amountFor }, dex }) => {
     const { state: prepareState, run: prepare } = useTask(
       async () => {
-        // 1. Approve amount of the tokenA
-        await dex.agent.approveAmount(tokenA.addr, tokenA.input)
+        // 1. Approve amount of the tokenA or max amount if expert mode is enabled
+        const amount = swapStore.expertMode ? new Wei(MAX_UINT256) : tokenA.input
+        await dex.agent.approveAmount(tokenA.addr, amount)
 
         // 2. Perform swap according to which token is "exact" and if
         // some of them is native
@@ -99,6 +102,8 @@ export const useSwapStore = defineStore('swap', () => {
 
   const pageRoute = useRoute()
   const isActiveRoute = computed(() => pageRoute.name === RouteName.Swap)
+
+  const expertMode = useLocalStorage<boolean>('expert-mode', true)
 
   const multihops = useLocalStorage<boolean>('swap-multi-hops', true)
   const disableMultiHops = computed({
@@ -331,6 +336,7 @@ export const useSwapStore = defineStore('swap', () => {
     resetInput,
 
     slippageTolerance,
+    expertMode,
     disableMultiHops,
   }
 })

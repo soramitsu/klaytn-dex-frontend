@@ -19,6 +19,11 @@ function open() {
 
       <div>
         <KlaySwitch
+          v-model="swapStore.expertMode"
+          label="Expert mode"
+        />
+        <br>
+        <KlaySwitch
           v-model="swapStore.disableMultiHops"
           label="Disable multi-hops"
         />
