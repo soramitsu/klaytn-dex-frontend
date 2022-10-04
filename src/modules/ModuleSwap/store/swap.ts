@@ -25,7 +25,12 @@ const debugModule = Debug('swap-store')
 
 type NormalizedWeiInput = TokensPair<TokenAddrAndWeiInput> & { trade: Trade; amountFor: TokenType }
 
-function useSwap(input: Ref<null | NormalizedWeiInput>) {
+function useSwap(
+  input: Ref<null | NormalizedWeiInput>,
+  options: {
+    onSuccess: () => void
+  },
+) {
   const dexStore = useDexStore()
   const swapStore = useSwapStore()
   const tokensStore = useTokensStore()
@@ -71,9 +76,7 @@ function useSwap(input: Ref<null | NormalizedWeiInput>) {
     })
 
     usePromiseLog(swapState, 'swap')
-    wheneverFulfilled(swapState, () => {
-      tokensStore.touchUserBalance()
-    })
+    wheneverFulfilled(swapState, options.onSuccess)
     useNotifyOnError(swapState, notify, 'Swap failed')
 
     return {
@@ -99,19 +102,14 @@ function useSwap(input: Ref<null | NormalizedWeiInput>) {
 
 export const useSwapStore = defineStore('swap', () => {
   const dexStore = useDexStore()
+  const tokensStore = useTokensStore()
 
   const pageRoute = useRoute()
   const isActiveRoute = computed(() => pageRoute.name === RouteName.Swap)
 
   const expertMode = useLocalStorage<boolean>('expert-mode', true)
 
-  const multihops = useLocalStorage<boolean>('swap-multi-hops', true)
-  const disableMultiHops = computed({
-    get: () => !multihops.value,
-    set: (v) => {
-      multihops.value = !v
-    },
-  })
+  const multihops = useLocalStorage<boolean>('swap-multi-hops', false)
 
   const slippageTolerance = ref(0)
 
@@ -138,7 +136,7 @@ export const useSwapStore = defineStore('swap', () => {
 
   function setBothTokens(pair: TokensPair<Address>) {
     selection.setBothAddrs(pair)
-    selection.resetInput()
+    resetInput()
   }
 
   const { estimatedFor, setEstimated, setMainToken } = useEstimatedLayer(selection)
@@ -210,13 +208,17 @@ export const useSwapStore = defineStore('swap', () => {
     pairs,
     amount: inputAmount,
     tokens: tokenImpls,
-    disableMultiHops,
+    disableMultiHops: logicNot(multihops),
   })
 
-  const trade = computed(() => (tradeResult.value?.kind === 'exist' ? tradeResult.value.trade : null))
+  const trade = computed(() => (tradeResult.value?.kind === 'ok' ? tradeResult.value.trade : null))
   const priceImpact = computed(() => trade.value?.priceImpact ?? null)
 
-  const { gotAmountFor, gettingAmountFor } = useSwapAmounts(
+  const {
+    gotAmountFor,
+    gettingAmountFor,
+    touch: touchAmounts,
+  } = useSwapAmounts(
     computed<GetAmountsProps | null>(() => {
       const input = inputAmount.value
       if (!input) return null
@@ -286,7 +288,18 @@ export const useSwapStore = defineStore('swap', () => {
 
   // #region Action
 
-  const { prepare, prepareState, swapState, swapFee, swap, clear: clearSwap } = useSwap(normalizedWeiInputs)
+  const {
+    prepare,
+    prepareState,
+    swapState,
+    swapFee,
+    swap,
+    clear: clearSwap,
+  } = useSwap(normalizedWeiInputs, {
+    onSuccess: () => {
+      tokensStore.touchUserBalance()
+    },
+  })
 
   // #endregion
 
@@ -303,6 +316,22 @@ export const useSwapStore = defineStore('swap', () => {
   const isValid = computed(() => swapValidation.value.kind === 'ok')
   const isValidationPending = computed(() => swapValidation.value.kind === 'pending')
   const validationError = computed(() => (swapValidation.value.kind === 'err' ? swapValidation.value.err : null))
+
+  // #endregion
+
+  // #region etc
+
+  const isRefreshing = logicOr(
+    toRef(tokensStore, 'isBalancePending'),
+    toRef(tokensStore, 'isDerivedUSDPending'),
+    computed(() => !!gettingAmountFor.value),
+  )
+
+  const refresh = () => {
+    tokensStore.touchUserBalance()
+    tokensStore.touchDerivedUsd()
+    touchAmounts()
+  }
 
   // #endregion
 
@@ -337,7 +366,10 @@ export const useSwapStore = defineStore('swap', () => {
 
     slippageTolerance,
     expertMode,
-    disableMultiHops,
+    multihops,
+
+    isRefreshing,
+    refresh,
   }
 })
 

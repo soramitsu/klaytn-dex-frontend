@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { Address } from '@/core'
 import { KlayIconCollapseArrow } from '~klay-icons'
+import TokenSelectModal from './TokenSelectModal.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -12,8 +13,8 @@ const props = withDefaults(
 
 const emit = defineEmits(['update:token'])
 
-const dexStore = useDexStore()
 const tokensStore = useTokensStore()
+
 const tokenData = computed(() => props.token && tokensStore.findTokenData(props.token))
 
 const model = useVModel(props, 'token', emit)
@@ -23,26 +24,13 @@ function onSelect(token: Address) {
   model.value = token
   isModalOpen.value = false
 }
-
-function isSmartContract(addr: Address) {
-  return dexStore.anyDex.dex().agent.isSmartContract(addr)
-}
-
-function getToken(addr: Address) {
-  return dexStore.anyDex.dex().tokens.getToken(addr)
-}
-
-function lookupToken(addr: Address) {
-  return tokensStore.findTokenData(addr)
-}
 </script>
 
 <template>
   <TokenSelectModal
-    v-model:open="isModalOpen"
+    v-model:show="isModalOpen"
     :selected="selected"
     :tokens="tokensStore.tokensWithBalance"
-    v-bind="{ isSmartContract, getToken, lookupToken }"
     @select="onSelect"
     @import-token="tokensStore.importToken($event)"
   />
