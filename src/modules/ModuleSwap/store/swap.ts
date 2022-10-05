@@ -19,7 +19,6 @@ import { useRates } from '@/modules/ModuleTradeShared/composable.rates'
 import { RouteName } from '@/types'
 import { useControlledComposedKey } from '@/utils/composable.controlled-composed-key'
 import { usePairsQuery } from '../query.pairs'
-import { MAX_UINT256 } from '@/modules/ModuleEarnShared/const'
 
 const debugModule = Debug('swap-store')
 
@@ -137,7 +136,7 @@ export const useSwapStore = defineStore('swap', () => {
     selection.addrs[type] = addr
   }
 
-  function setBothTokens(pair: TokensPair<Address>) {
+  function setBothTokens(pair: TokensPair<Address | null>) {
     selection.setBothAddrs(pair)
     resetInput()
   }
