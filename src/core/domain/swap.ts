@@ -5,6 +5,8 @@ import CommonContracts from './CommonContracts'
 import { Agent } from './agent'
 import { TransactionObject, IsomorphicOverrides } from '../isomorphic-contract'
 import invariant from 'tiny-invariant'
+import { MAX_UINT256 } from '@/modules/ModuleEarnShared/const'
+import { Dex } from './dex'
 
 interface HasTrade {
   trade: Trade
@@ -19,6 +21,11 @@ export interface SwapPropsBase extends HasTrade {
    * @defualt 0
    */
   allowedSlippage?: Percent
+  /**
+   * @defualt false
+   */
+  expertMode?: boolean
+  dex: Dex
 }
 
 export interface SwapExactAForB<A extends string, B extends string> {
@@ -127,6 +134,7 @@ export class Swap extends SwapPure {
   }
 
   public async prepareSwap(props: SwapProps): Promise<SwapResult> {
+    console.log(props)
     const router = this.contracts.get('router') || (await this.contracts.init('router'))
 
     const { deadline = deadlineFiveMinutesFromNow() } = props
@@ -138,6 +146,10 @@ export class Swap extends SwapPure {
       amountOut: { asStr: amountOut },
     } = applySlippage(props)
     const amountIn = amountInAsWei.asStr
+
+    // Approve amount of the tokenA or MAX_UINT256 amount if expert mode is enabled
+    const approveAmount = props.expertMode ? new Wei(MAX_UINT256) : new Wei(amountIn)
+    await props.dex.agent.approveAmount(props.trade.route.input.address, approveAmount)
 
     const gasPrice = await this.#agent.getGasPrice()
     const baseOverrides: IsomorphicOverrides = {

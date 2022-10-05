@@ -33,7 +33,7 @@ function useSwap(
 ) {
   const dexStore = useDexStore()
   const swapStore = useSwapStore()
-  const tokensStore = useTokensStore()
+
   const { notify } = useNotify()
 
   const swapKey = computed(() => {
@@ -52,13 +52,16 @@ function useSwap(
   const scope = useParamScope(filteredKey, ({ props: { trade, tokenA, tokenB, amountFor }, dex }) => {
     const { state: prepareState, run: prepare } = useTask(
       async () => {
-        // 1. Approve amount of the tokenA or max amount if expert mode is enabled
-        const amount = swapStore.expertMode ? new Wei(MAX_UINT256) : tokenA.input
-        await dex.agent.approveAmount(tokenA.addr, amount)
-
-        // 2. Perform swap according to which token is "exact" and if
+        // Perform swap according to which token is "exact" and if
         // some of them is native
-        const swapProps = buildSwapProps({ trade, tokenA, tokenB, referenceToken: mirrorTokenType(amountFor) })
+        const swapProps = buildSwapProps({
+          trade,
+          tokenA,
+          tokenB,
+          referenceToken: mirrorTokenType(amountFor),
+          expertMode: swapStore.expertMode,
+          dex,
+        })
         const { send, fee } = await dex.swap.prepareSwap(swapProps)
 
         return { send, fee }

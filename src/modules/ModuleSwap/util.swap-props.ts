@@ -1,4 +1,4 @@
-import { Wei, Address, isNativeToken, Trade } from '@/core'
+import { Wei, Address, isNativeToken, Trade, Dex } from '@/core'
 import { SwapProps } from '@/core/domain/swap'
 import { TokenType } from '@/utils/pair'
 import invariant from 'tiny-invariant'
@@ -13,11 +13,15 @@ export function buildSwapProps({
   tokenA,
   tokenB,
   referenceToken,
+  expertMode,
+  dex,
 }: {
   trade: Trade
   tokenA: TokenAddrAndWeiInput
   tokenB: TokenAddrAndWeiInput
   referenceToken: TokenType
+  expertMode: boolean
+  dex: Dex
 }): SwapProps {
   invariant(tokenA.addr !== tokenB.addr, 'Cannot swap token for itself')
 
@@ -31,6 +35,8 @@ export function buildSwapProps({
       amountIn: tokenA.input,
       amountOutMin: tokenB.input,
       trade,
+      expertMode,
+      dex,
     }
 
     return isTokenANative
@@ -45,6 +51,8 @@ export function buildSwapProps({
       amountInMax: tokenA.input,
       amountOut: tokenB.input,
       trade,
+      expertMode,
+      dex,
     }
 
     return isTokenANative
