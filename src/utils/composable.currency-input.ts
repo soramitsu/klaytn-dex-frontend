@@ -270,11 +270,7 @@ export function useNormalizedComponentProps(props: FormatComponentProps): {
     return numeric ?? (props.usd ? CURRENCY_USD.decimals : undefined)
   })
 
-  const decimalsPopover = eagerComputed(() => {
-    const raw = props.decimalsPopover
-    const numeric = typeof raw === 'string' ? Number(raw) : typeof raw === 'number' ? raw : undefined
-    return numeric ?? undefined
-  })
+  const decimalsPopover = decimals
 
   const symbol = computed<null | MaskSymbolWithDelimiter>(() =>
     props.usd
