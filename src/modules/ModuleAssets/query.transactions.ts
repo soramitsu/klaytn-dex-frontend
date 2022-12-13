@@ -72,8 +72,6 @@ export interface TransactionsQueryResult {
   burns: FragmentBurn[]
 }
 
-const LIMIT = 5
-
 const FRAGMENT_PAIR = gql`
   fragment pair on Pair {
     token0 {
@@ -144,8 +142,18 @@ const FRAGMENT_BURN = gql`
   ${FRAGMENT_PAIR}
 `
 
-export function useTransactionsQueryByAccount(props: { account: MaybeRef<null | Address> }) {
-  let first = LIMIT
+export function useTransactionsQueryByAccount(props: {
+  account: MaybeRef<null | Address>
+  itemsOnPage: Ref<number | null>
+}) {
+  const first = ref<number>(0)
+  watch(
+    props.itemsOnPage,
+    (val) => {
+      first.value = Math.max(first.value, val ?? 0)
+    },
+    { immediate: true },
+  )
 
   const { result, loading, fetchMore, load, refetch } = useLazyQuery<TransactionsQueryResult>(
     gql`
@@ -166,10 +174,10 @@ export function useTransactionsQueryByAccount(props: { account: MaybeRef<null | 
     `,
     () => ({
       userId: unref(props.account),
-      first,
+      first: first.value,
     }),
     () => ({
-      enabled: !!unref(props.account),
+      enabled: !!unref(props.account) && first.value > 0,
       clientId: ApolloClientId.Exchange,
     }),
   )
@@ -180,9 +188,9 @@ export function useTransactionsQueryByAccount(props: { account: MaybeRef<null | 
     enumerated: useTransactionEnum(result),
     loading,
     fetchMore: () => {
-      first += LIMIT
+      first.value += props.itemsOnPage.value ?? 0
       fetchMore({
-        variables: { first },
+        variables: { first: first.value },
         updateQuery: (prev, { fetchMoreResult }) => {
           if (!fetchMoreResult) return prev
           return fetchMoreResult

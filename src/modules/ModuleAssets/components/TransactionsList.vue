@@ -15,7 +15,10 @@ const props = defineProps<{
   loading?: boolean
 }>()
 
-const emit = defineEmits(['load-more'])
+const emit = defineEmits<{
+  (event: 'load-more'): void
+  (event: 'update:page-size', size: number): void
+}>()
 
 const openDetailsFor = shallowRef<null | TransactionEnum>(null)
 
@@ -31,6 +34,11 @@ const {
 )
 
 useInfiniteScroll(containerProps.ref, () => emit('load-more'), { distance: ITEM_HEIGHT / 2 })
+
+watch(useElementBounding(containerProps.ref).height, (height) => {
+  const items = Math.ceil(height / ITEM_HEIGHT)
+  emit('update:page-size', items)
+})
 </script>
 
 <template>
@@ -53,7 +61,7 @@ useInfiniteScroll(containerProps.ref, () => emit('load-more'), { distance: ITEM_
       <ListItem
         v-for="x in virtualList"
         :key="x.index"
-        height="56"
+        :height="ITEM_HEIGHT"
         :item="x.data"
         @click="openDetailsFor = x.data"
       />
