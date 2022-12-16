@@ -6,4 +6,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "print debug"
-        run: echo ${{ github }}
+        run: echo ${{ github.repository }}
