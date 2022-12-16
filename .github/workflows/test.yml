@@ -1,0 +1,9 @@
+name: "CLA Assistant"
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "print debug"
+        run: echo {{ github }}
