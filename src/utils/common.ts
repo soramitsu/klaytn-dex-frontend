@@ -91,10 +91,7 @@ export function formatNumberWithSignificant(value: string | number | BigNumber, 
 }
 
 export function formatNumberWithCommas(value: string | number | BigNumber): string {
-  const a = value.toString().split('.')
-  const beforePeriod = a[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  const periodAndDecimals = a[1] ? '.' + a[1] : ''
-  return beforePeriod + periodAndDecimals
+  return value.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')
 }
 
 /**
