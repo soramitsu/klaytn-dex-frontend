@@ -315,8 +315,6 @@ function openRoiCalculator() {
 @use '@/styles/vars';
 
 .input {
-  display: flex;
-  flex-direction: column;
   width: 388px;
   max-width: 100%;
 
@@ -324,7 +322,7 @@ function openRoiCalculator() {
     font-weight: 500;
     font-size: 12px;
     color: vars.$gray2;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
   }
 
   &-value {

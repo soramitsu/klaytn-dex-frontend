@@ -89,8 +89,8 @@ const anyWarning = logicOr(warningMayBeFrontrun, warningMayFail)
           <CurrencyInput
             v-model="inputModel"
             class="w-60px sm:w-88px"
-            symbol="%"
             :decimals="PERCENT_DECIMALS"
+            symbol="%"
             symbol-position="right"
             symbol-delimiter=""
           />

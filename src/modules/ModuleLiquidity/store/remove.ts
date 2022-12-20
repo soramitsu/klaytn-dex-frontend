@@ -1,13 +1,12 @@
-import { Address, Token, TokenAmount, TokenImpl, Wei } from '@/core'
+import { Address, Token, Wei } from '@/core'
 import {
   computeEstimatedPoolShare,
-  PairAddressResult,
   useNullablePairBalanceComponents,
   usePairAddress,
   usePairBalance,
   usePairReserves,
 } from '@/modules/ModuleTradeShared/composable.pair-by-tokens'
-import { buildPair, completePairOrNull, TokensPair, TOKEN_TYPES } from '@/utils/pair'
+import { buildPair, TokensPair, TOKEN_TYPES } from '@/utils/pair'
 import { acceptHMRUpdate, defineStore, storeToRefs } from 'pinia'
 import invariant from 'tiny-invariant'
 import { Ref } from 'vue'
@@ -15,7 +14,6 @@ import { useRates } from '@/modules/ModuleTradeShared/composable.rates'
 import { RouteName } from '@/types'
 import { useControlledComposedKey } from '@/utils/composable.controlled-composed-key'
 import { match, P } from 'ts-pattern'
-import { useMinimalTokensApi } from '@/utils/minimal-tokens-api'
 
 function usePrepareSupply(props: {
   tokens: Ref<null | TokensPair<Address>>
@@ -52,8 +50,6 @@ function usePrepareSupply(props: {
 
   const isReadyToPrepareSupply = computed(() => !!scopeKey.value)
 
-  const liquidityListStore = useLiquidityListStore()
-
   const scope = useParamScope(filteredKey, ({ payload: { tokens, pair, liquidity: lpTokenValue, amounts, dex } }) => {
     const { state: prepareState, run: prepare } = useTask(
       () =>
@@ -78,10 +74,6 @@ function usePrepareSupply(props: {
 
     usePromiseLog(supplyState, 'liquidity-remove-supply')
     useNotifyOnError(supplyState, notify, 'Supply failed')
-
-    wheneverFulfilled(supplyState, () => {
-      liquidityListStore.quickPoll = true
-    })
 
     const fee = computed(() => prepareState.fulfilled?.value?.fee)
 
@@ -114,7 +106,8 @@ function usePrepareSupply(props: {
 }
 
 function useRemoveAmounts(
-  pairResult: Ref<null | PairAddressResult>,
+  tokens: Ref<null | TokensPair<Address>>,
+  pair: Ref<null | Address>,
   liquidity: Ref<null | Wei>,
 ): {
   pending: Ref<boolean>
@@ -126,15 +119,16 @@ function useRemoveAmounts(
   const scope = useParamScope(
     computed(() => {
       const activeDex = dexStore.active
-      const pair = pairResult.value
+      if (!tokens.value || activeDex.kind !== 'named') return null
+      const pairAddr = pair.value
       const lpTokenValue = liquidity.value
-      if (!(lpTokenValue && activeDex.kind === 'named' && lpTokenValue.asBigInt && pair?.kind === 'exist')) return null
+      if (!pairAddr || !lpTokenValue || !lpTokenValue.asBigInt) return null
 
-      const key = `dex-${activeDex.wallet}-${pair.addr}-${lpTokenValue.asStr}`
+      const key = `dex-${activeDex.wallet}-${pairAddr}-${lpTokenValue.asStr}`
 
       return {
         key,
-        payload: { pair: pair.addr, lpTokenValue, tokens: pair.tokens, dex: activeDex.dex() },
+        payload: { pair: pairAddr, lpTokenValue, tokens: tokens.value, dex: activeDex.dex() },
       }
     }),
     ({ payload: { pair, lpTokenValue, tokens, dex } }) => {
@@ -203,21 +197,25 @@ export const useLiquidityRmStore = defineStore('liquidity-remove', () => {
 
   // #region Pair
 
-  const { pair: pairResult, pending: isPairPending, touch: touchPairAddress } = usePairAddress(selectedFiltered)
+  const { pair: pairResult, pending: isPairPending } = usePairAddress(selectedFiltered)
   const existingPair = computed(() => (pairResult.value?.kind === 'exist' ? pairResult.value : null))
-  const doesPairExist = computedEagerUsingWatch(() => !!existingPair.value)
+  const doesPairExist = eagerComputed(() => !!existingPair.value)
 
   const {
     result: pairBalanceResult,
     pending: isPairBalancePending,
     touch: touchPairBalance,
-  } = usePairBalance(pairResult)
+  } = usePairBalance(selectedFiltered, doesPairExist)
 
   const { totalSupply: pairTotalSupply, userBalance: pairUserBalance } = toRefs(
     useNullablePairBalanceComponents(pairBalanceResult),
   )
 
-  const { result: pairReserves, pending: isReservesPending, touch: touchPairReserves } = usePairReserves(pairResult)
+  const {
+    result: pairReserves,
+    pending: isReservesPending,
+    touch: touchPairReserves,
+  } = usePairReserves(selectedFiltered, doesPairExist)
 
   // #endregion
 
@@ -251,7 +249,6 @@ export const useLiquidityRmStore = defineStore('liquidity-remove', () => {
 
   function clear() {
     liquidity.value = null
-    selectedRaw.value = null
   }
 
   // #endregion
@@ -266,24 +263,17 @@ export const useLiquidityRmStore = defineStore('liquidity-remove', () => {
       .otherwise(() => null),
   )
 
-  const { amounts, pending: isAmountsPending, touch: touchAmounts } = useRemoveAmounts(pairResult, liquidity)
+  const {
+    amounts,
+    pending: isAmountsPending,
+    touch: touchAmounts,
+  } = useRemoveAmounts(
+    selectedFiltered,
+    computed(() => existingPair.value?.addr ?? null),
+    liquidity,
+  )
 
-  const tokens = computed(() => {
-    const { lookupToken } = useMinimalTokensApi()
-    const result = pairResult.value
-    return result ? buildPair((type) => lookupToken(result.tokens[type])) : null
-  })
-  const tokenAmounts = computed(() => {
-    const tokensValue = tokens.value
-    const amountsValue = amounts.value
-    if (!tokensValue || !amountsValue) return null
-    return buildPair((type) => {
-      const token = tokensValue[type]
-      return token ? TokenAmount.fromWei(new TokenImpl(token), amountsValue[type]) : null
-    })
-  })
-
-  const rates = useRates(computed(() => completePairOrNull(tokenAmounts.value)))
+  const rates = useRates(amounts)
 
   // #endregion
 
@@ -305,16 +295,14 @@ export const useLiquidityRmStore = defineStore('liquidity-remove', () => {
   })
 
   function closeSupply() {
-    const wasFulfilled = !!supplyState.value?.fulfilled
-    clearSupply()
-
-    if (wasFulfilled) {
-      navigateToLiquidity()
-    } else {
+    if (supplyState.value?.fulfilled) {
       touchAmounts()
       touchPairBalance()
       touchPairReserves()
     }
+
+    clearSupply()
+    navigateToLiquidity()
   }
 
   // #endregion
@@ -334,7 +322,6 @@ export const useLiquidityRmStore = defineStore('liquidity-remove', () => {
   )
 
   const refresh = () => {
-    touchPairAddress()
     touchAmounts()
     touchPairBalance()
     touchPairReserves()
@@ -355,8 +342,7 @@ export const useLiquidityRmStore = defineStore('liquidity-remove', () => {
     isReservesPending,
     isPairBalancePending,
     isPairPending,
-    doesPairExist,
-    pairResult,
+    isPairLoaded: doesPairExist,
 
     liquidity,
     liquidityRelative,

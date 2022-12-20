@@ -6,7 +6,6 @@ import { Opaque } from 'type-fest'
 import { Ref } from 'vue'
 import { byValue, byString } from 'sort-es'
 import { ApolloClientId } from '@/types'
-import { ITEM_HEIGHT, WRAP_HEIGHT } from './const'
 
 export type TimestampEpochSec = Opaque<string, 'timestamp-unix-epoch-sec'>
 
@@ -73,7 +72,7 @@ export interface TransactionsQueryResult {
   burns: FragmentBurn[]
 }
 
-const LIMIT = Math.ceil(WRAP_HEIGHT / ITEM_HEIGHT)
+const LIMIT = 5
 
 const FRAGMENT_PAIR = gql`
   fragment pair on Pair {

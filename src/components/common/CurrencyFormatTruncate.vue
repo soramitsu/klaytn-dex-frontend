@@ -60,25 +60,16 @@ const maxWidthString = computed(() => {
 })
 
 const formattedAmountWithoutSymbol = computed(() =>
-  resolvedAmount.value
-    ? formatCurrency({
-        amount: resolvedAmount.value,
-        decimals: resolvedDecimals.value,
-        significant: props.usd || props.percent ? SIGNIFICANT : null,
-      })
-    : null,
+  resolvedAmount.value ? formatCurrency({ amount: resolvedAmount.value, decimals: resolvedDecimals.value }) : null,
 )
 
-const SIGNIFICANT = 7
-
-const formattedAmountPopover = computed(
+const formattedAmount = computed(
   () =>
     resolvedAmount.value &&
     formatCurrency({
       amount: resolvedAmount.value,
       decimals: resolvedDecimalsPopover.value,
       symbol: resolvedSymbol.value,
-      significant: props.usd || props.percent ? SIGNIFICANT : null,
     }),
 )
 </script>
@@ -110,7 +101,7 @@ const formattedAmountPopover = computed(
         :class="$style.popper"
         class="select-text px-2 py-1 bg-white rounded-md shadow-md cursor-text"
       >
-        {{ formattedAmountPopover }}
+        {{ formattedAmount }}
       </div>
     </template>
   </SPopover>

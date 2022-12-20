@@ -3,7 +3,6 @@ import { storeToRefs } from 'pinia'
 import { KlayIconRefresh, KlayIconArrowDown_2 } from '~klay-icons'
 import { RouteName, Tab } from '@/types'
 import TheTokensApiProvider from '@/components/TheTokensApiProvider.vue'
-import { WRAP_HEIGHT } from '@/modules/ModuleAssets/const'
 
 const AssetsTabs = {
   Assets: 'assets',
@@ -52,10 +51,7 @@ const onAssetDetails = computed(() => tab.value === null)
 
 <template>
   <TheTokensApiProvider>
-    <div
-      class="wrap mx-auto space-y-4 flex flex-col overflow-hidden"
-      :style="{ height: `${WRAP_HEIGHT}px` }"
-    >
+    <div class="wrap mx-auto space-y-4 flex flex-col overflow-hidden">
       <div
         v-if="!account"
         class="p-4 text-center"
@@ -128,5 +124,6 @@ const onAssetDetails = computed(() => tab.value === null)
   box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.05);
   border-radius: 20px;
   max-width: 420px;
+  height: 600px;
 }
 </style>

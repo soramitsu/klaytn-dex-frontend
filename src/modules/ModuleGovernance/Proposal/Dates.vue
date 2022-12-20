@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { shortenStringInTheMiddle } from '@/utils/common'
 import { Proposal } from '../types'
+import CONFIG from '~config'
 
 const { t } = useI18n()
 

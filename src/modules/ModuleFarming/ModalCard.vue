@@ -22,7 +22,6 @@ const emit = defineEmits<(e: 'staked' | 'unstaked', amount: WeiAsToken<BigNumber
 const { notify } = useNotify()
 const dexStore = useDexStore()
 const tokensStore = useTokensStore()
-const liquidityListStore = useLiquidityListStore()
 
 const inputAmount = shallowRef(new BigNumber(0) as WeiAsToken<BigNumber>)
 
@@ -98,7 +97,6 @@ wheneverFulfilled(operationState, ({ amount, operation }) => {
     emit('unstaked', amount)
   }
 
-  liquidityListStore.quickPoll = true
   tokensStore.touchUserBalance()
 })
 

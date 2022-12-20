@@ -20,7 +20,7 @@ export default createRouter({
         },
         {
           name: RouteName.LiquidityAdd,
-          path: '/liquidity/add/:tokenA?/:tokenB?',
+          path: '/liquidity/add',
           component: () => import('./pages/trade/liquidity/add.vue'),
         },
         {

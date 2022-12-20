@@ -43,6 +43,7 @@ const balanceUsd = computed(() => {
       >
         <CurrencyFormat
           :amount="lookupDerivedUsd(token.address)"
+          decimals="2"
           usd
         />
       </span>
@@ -60,6 +61,7 @@ const balanceUsd = computed(() => {
           <CurrencyFormatTruncate
             :amount="balanceUsd"
             usd
+            decimals="2"
             :class="$style.lineBottom"
           />
         </div>

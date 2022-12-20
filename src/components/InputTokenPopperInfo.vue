@@ -27,6 +27,7 @@ const balanceAsUsd = computed(() => (props.derivedUsd ? props.derivedUsd.times(p
       <CurrencyFormatTruncate
         usd
         :amount="balanceAsUsd"
+        decimals="2"
         :class="$style.subtitle"
       />
     </div>

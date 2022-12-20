@@ -75,6 +75,7 @@ const balanceInUsd = computed(() => {
               :class="$style.title2"
               :amount="balanceInUsd"
               usd
+              decimals="2"
               max-width="100"
             />
           </div>

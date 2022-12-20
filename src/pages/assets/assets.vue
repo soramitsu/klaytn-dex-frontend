@@ -24,6 +24,7 @@ assetsStore.useRefreshButton(reactive({ loading: isRefreshing, onClick: refresh 
         <CurrencyFormat
           :amount="totalUsd"
           usd
+          decimals="2"
         />
       </span>
     </div>

@@ -1,6 +1,7 @@
 import { Address, isEmptyAddress, Percent, Wei } from '@/core'
 import { ActiveDex, AnyDex } from '@/store/dex'
 import { TokensPair } from '@/utils/pair'
+import { MaybeRef } from '@vueuse/core'
 import { Ref } from 'vue'
 
 type NullableReactiveTokens = TokensPair<Address | null> | Ref<null | TokensPair<null | Address>>
@@ -24,12 +25,19 @@ function composeKeyWithAnyDex(tokens: NullableReactiveTokens, anyDex: AnyDex) {
   )
 }
 
-function composeKeyWithNamedDexAndExistingPair(pairResult: null | PairAddressResult, dex: ActiveDex) {
+function composeKeyWithNamedDexAndExistingPair(
+  tokens: NullableReactiveTokens,
+  activeDex: ActiveDex,
+  pairExists: MaybeRef<boolean>,
+) {
+  const tokensKey = nullableReactiveTokensToComposedKey(tokens)
+
   return (
-    pairResult?.kind === 'exist' &&
-    dex.kind === 'named' && {
-      key: `${dex.wallet}-${pairResult.tokens.tokenA}-${pairResult.tokens.tokenB}`,
-      payload: { dex: dex.dex(), pair: pairResult.addr, tokens: pairResult.tokens },
+    unref(pairExists) &&
+    tokensKey &&
+    activeDex.kind === 'named' && {
+      key: `${activeDex.wallet}-${tokensKey.key}`,
+      payload: { dex: activeDex.dex(), tokens: tokensKey.payload },
     }
   )
 }
@@ -88,11 +96,11 @@ export function useSimplifiedResult(result: Ref<null | PairAddressResult>): Ref<
   return computed(() => result.value?.kind ?? null)
 }
 
-export function usePairReserves(pairResult: Ref<null | PairAddressResult>) {
+export function usePairReserves(tokens: NullableReactiveTokens, pairExists: MaybeRef<boolean>) {
   const dexStore = useDexStore()
 
   const scope = useParamScope(
-    () => composeKeyWithNamedDexAndExistingPair(pairResult.value, dexStore.active),
+    () => composeKeyWithNamedDexAndExistingPair(tokens, dexStore.active, pairExists),
     ({ payload: { tokens, dex } }) => {
       const { state, run } = useTask(() => dex.tokens.getPairReserves(tokens), { immediate: true })
       usePromiseLog(state, 'pair-reserves')
@@ -112,7 +120,10 @@ interface PairBalance {
   userBalance: Wei
 }
 
-export function usePairBalance(pairResult: Ref<null | PairAddressResult>): {
+export function usePairBalance(
+  tokens: NullableReactiveTokens,
+  pairExists: MaybeRef<boolean>,
+): {
   pending: Ref<boolean>
   result: Ref<null | PairBalance>
   touch: () => void
@@ -120,7 +131,7 @@ export function usePairBalance(pairResult: Ref<null | PairAddressResult>): {
   const dexStore = useDexStore()
 
   const scope = useParamScope(
-    () => composeKeyWithNamedDexAndExistingPair(pairResult.value, dexStore.active),
+    () => composeKeyWithNamedDexAndExistingPair(tokens, dexStore.active, pairExists),
     ({ payload: { tokens, dex } }) => {
       const { state, run } = useTask(
         async () => {

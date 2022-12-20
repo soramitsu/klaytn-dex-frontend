@@ -4,7 +4,6 @@ import TokenImpl from './TokenImpl'
 import Wei, { WeiAsToken } from './Wei'
 
 import { UniToken, UniCurrencyAmount } from './uni-entities'
-import BigNumber from 'bignumber.js'
 
 export default class TokenAmount extends CurrencyAmount<TokenImpl> {
   public static fromWei(token: TokenImpl, amount: Wei): TokenAmount {
@@ -18,21 +17,15 @@ export default class TokenAmount extends CurrencyAmount<TokenImpl> {
   }
 
   public static fromUni(amount: UniCurrencyAmount<UniToken>): TokenAmount {
-    const token = TokenImpl.fromUni(amount.currency)
     return new TokenAmount(
-      token,
+      TokenImpl.fromUni(amount.currency),
       amount.numerator.toString(),
-      // uniswap returns RAW fraction value
-      BigInt(amount.denominator.toString()) * 10n ** BigInt(token.decimals),
+      amount.denominator.toString(),
     )
   }
 
   public toWei(): Wei {
-    return new Wei(
-      new BigNumber((this.numerator * 10n ** BigInt(this.currency.decimals)).toString()).dividedBy(
-        this.denominator.toString(),
-      ),
-    )
+    return new Wei(this.numerator)
   }
 
   public toFraction(): Fraction {
