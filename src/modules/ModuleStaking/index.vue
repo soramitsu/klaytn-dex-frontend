@@ -126,11 +126,12 @@ function handleStakedUnstaked() {
       :class="$style.empty"
       class="flex-1 flex items-center justify-center"
     >
-      {{
-        !pools?.length
-          ? 'There are no staking pools at the moment'
-          : 'There are no staking pools match the current filter'
-      }}
+      <template v-if="pools?.length">
+        There are no staking pools match the current filter
+      </template>
+      <template v-else>
+        There are no staking pools at the moment
+      </template>
     </div>
     <template v-if="poolsFinal?.length">
       <div
