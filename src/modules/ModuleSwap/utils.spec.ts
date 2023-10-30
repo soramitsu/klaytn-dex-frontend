@@ -14,13 +14,13 @@ describe('Compute fees', () => {
           "fee": "3",
           "pair": [
             {
-              "address": "0x73365f8f27de98d7634be67a167f229b32e7bf6c",
+              "address": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
               "decimals": 18,
               "name": "KLAY",
               "symbol": "KLAY",
             },
             {
-              "address": "0x42f127458246b1db8d8a58d31a22b307408439e4",
+              "address": "0xeB800b8ac8B503e2544F4dfc3EF7012793172b9b",
               "decimals": 18,
               "name": "DEX Token",
               "symbol": "DEX",
@@ -41,13 +41,13 @@ describe('Compute fees', () => {
           "fee": "100",
           "pair": [
             {
-              "address": "0x73365f8f27de98d7634be67a167f229b32e7bf6c",
+              "address": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
               "decimals": 18,
               "name": "KLAY",
               "symbol": "KLAY",
             },
             {
-              "address": "0x42f127458246b1db8d8a58d31a22b307408439e4",
+              "address": "0xeB800b8ac8B503e2544F4dfc3EF7012793172b9b",
               "decimals": 18,
               "name": "DEX Token",
               "symbol": "DEX",
@@ -58,7 +58,7 @@ describe('Compute fees', () => {
           "fee": "200",
           "pair": [
             {
-              "address": "0x42f127458246b1db8d8a58d31a22b307408439e4",
+              "address": "0xeB800b8ac8B503e2544F4dfc3EF7012793172b9b",
               "decimals": 18,
               "name": "DEX Token",
               "symbol": "DEX",

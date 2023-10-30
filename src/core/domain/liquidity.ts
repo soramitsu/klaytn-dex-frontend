@@ -349,7 +349,7 @@ if (import.meta.vitest) {
       ).toMatchInlineSnapshot(`
         {
           "native": {
-            "addr": "0x73365f8f27de98d7634be67a167f229b32e7bf6c",
+            "addr": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
             "amount": "123",
           },
           "token": {
@@ -369,7 +369,7 @@ if (import.meta.vitest) {
       ).toMatchInlineSnapshot(`
         {
           "native": {
-            "addr": "0x73365f8f27de98d7634be67a167f229b32e7bf6c",
+            "addr": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
             "amount": "321",
           },
           "token": {
