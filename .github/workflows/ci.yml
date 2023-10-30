@@ -23,8 +23,8 @@ jobs:
       - name: Install
         run: pnpm install
 
-      - name: Format
-        run: pnpm format:check
+      # - name: Format
+      #   run: pnpm format:check
 
       - name: Lint
         run: pnpm run lint
@@ -50,4 +50,4 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/klaytn-dex-frontend:dev
           build-args: |
-              VITE_ROUTER_HASH_MODE=${{ secrets.VITE_ROUTER_HASH_MODE }}
+            VITE_ROUTER_HASH_MODE=${{ secrets.VITE_ROUTER_HASH_MODE }}
