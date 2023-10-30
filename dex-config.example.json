@@ -7,13 +7,13 @@
   },
   "tokens": [
     {
-      "address": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
+      "address": "0x1e8d0a7f0cc9b6f840ca407586a648834a7187ad",
       "name": "KLAY",
       "symbol": "KLAY",
       "decimals": 18
     },
     {
-      "address": "0xeB800b8ac8B503e2544F4dfc3EF7012793172b9b",
+      "address": "0xeb800b8ac8b503e2544f4dfc3ef7012793172b9b",
       "decimals": 18,
       "symbol": "DEX",
       "name": "DEX Token"
@@ -79,14 +79,14 @@
       "decimals": 18
     }
   ],
-  "tokenNative": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
-  "tokenDex": "0xeB800b8ac8B503e2544F4dfc3EF7012793172b9b",
+  "tokenNative": "0x1e8d0a7f0cc9b6f840ca407586a648834a7187ad",
+  "tokenDex": "0xeb800b8ac8b503e2544f4dfc3ef7012793172b9b",
   "smartcontracts": {
-    "router": "0xe1E55c44ed74E618B6540Bd6fd7eB6C0e4A62F16",
-    "factory": "0x23562dA76006daF25d1CC5a85f0fAFF6d8B14B4d",
-    "weth": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
-    "multicall": "0x8406335c902f1AbD4d87dE11D9d147d257D9ADdc",
-    "farming": "0x0207055B5CfF1A7174eDb9898F33098535157a84"
+    "router": "0xe1e55c44ed74e618b6540bd6fd7eb6c0e4a62f16",
+    "factory": "0x23562da76006daf25d1cc5a85f0faff6d8b14b4d",
+    "weth": "0x1e8d0a7f0cc9b6f840ca407586a648834a7187ad",
+    "multicall": "0x8406335c902f1abd4d87de11d9d147d257d9addc",
+    "farming": "0x0207055b5cff1a7174edb9898f33098535157a84"
   },
   "subgraphs": {
     "exchange": "http://localhost:8000/subgraphs/name/klaytn-subgraph/exchange",
