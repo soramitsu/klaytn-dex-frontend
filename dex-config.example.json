@@ -7,13 +7,13 @@
   },
   "tokens": [
     {
-      "address": "0x73365f8f27de98d7634be67a167f229b32e7bf6c",
+      "address": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
       "name": "KLAY",
       "symbol": "KLAY",
       "decimals": 18
     },
     {
-      "address": "0x42f127458246b1db8d8a58d31a22b307408439e4",
+      "address": "0xeB800b8ac8B503e2544F4dfc3EF7012793172b9b",
       "decimals": 18,
       "symbol": "DEX",
       "name": "DEX Token"
@@ -79,22 +79,22 @@
       "decimals": 18
     }
   ],
-  "tokenNative": "0x73365f8f27de98d7634be67a167f229b32e7bf6c",
-  "tokenDex": "0x42f127458246b1db8d8a58d31a22b307408439e4",
+  "tokenNative": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
+  "tokenDex": "0xeB800b8ac8B503e2544F4dfc3EF7012793172b9b",
   "smartcontracts": {
-    "router": "0xce12c887fae83a5f94f6cf3c8d4c1cee8b1c7786",
-    "factory": "0x339ba51a3d65ad5418aee14b0546088bfe99403c",
-    "weth": "0x73365f8f27de98d7634be67a167f229b32e7bf6c",
-    "multicall": "0x4d25d48f8a072446c3aa84ba482092a0bea0bf5d",
-    "farming": "0xf68b8d3fae7feb747cb4dce0a4c91a100b140245"
+    "router": "0xe1E55c44ed74E618B6540Bd6fd7eB6C0e4A62F16",
+    "factory": "0x23562dA76006daF25d1CC5a85f0fAFF6d8B14B4d",
+    "weth": "0x1e8d0A7F0Cc9B6F840Ca407586A648834A7187aD",
+    "multicall": "0x8406335c902f1AbD4d87dE11D9d147d257D9ADdc",
+    "farming": "0x0207055B5CfF1A7174eDb9898F33098535157a84"
   },
   "subgraphs": {
-    "exchange": "https://graph.ipfs1.dev.infra.soramitsu.co.jp/subgraphs/name/klaytn-subgraph/exchange",
-    "farming": "https://graph.ipfs1.dev.infra.soramitsu.co.jp/subgraphs/name/klaytn-subgraph/farming",
-    "staking": "https://graph.ipfs1.dev.infra.soramitsu.co.jp/subgraphs/name/klaytn-subgraph/staking",
+    "exchange": "http://localhost:8000/subgraphs/name/klaytn-subgraph/exchange",
+    "farming": "http://localhost:8000/subgraphs/name/klaytn-subgraph/farming",
+    "staking": "http://localhost:8000/subgraphs/name/klaytn-subgraph/staking",
     "snapshot": "https://hub.snapshot.org/graphql"
   },
-  "uriDashboards": "https://klaytn-dashboard.dev.klaytn.tachi.soramitsu.co.jp",
+  "uriDashboards": "http://localhost:81",
   "snapshotSpace": "test-klaytn-dex.eth",
   "uriConnectWalletGuide": "https://github.com/klaytn/klaytn-dex-frontend/blob/dev/docs/guide.md#connect-wallet",
   "uriIPFS": "https://snapshot.mypinata.cloud/ipfs"

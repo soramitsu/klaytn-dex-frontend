@@ -11,5 +11,6 @@ def pipeline = new org.js.AppPipeline(
     buildCmds: ['cp dex-config.example.json dex-config.json','pnpm build'],
     sonarProjectName: 'klaytn-frontend',
     sonarProjectKey: 'jp.co.soramitsu:klaytn-frontend',
+    dockerImageTags: ['feature/workshop': 'local'],
     gitUpdateSubmodule: true)
 pipeline.runPipeline()
